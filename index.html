@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" class="text-[15px]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReachUp</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1D1D1F;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .carousel-item {
+      opacity: 0;
+      position: absolute;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .carousel-item.active {
+      opacity: 1;
+      position: relative;
+    }
+
+    .slideshow-wrapper {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .card {
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    #sidebar {
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.5);
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h3,
+    .card h4 {
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .card p {
+      color: #6b7280;
+    }
+
+    .transition-all {
+      transition: all 0.2s ease-in-out;
+    }
+
+    .search-input {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid #d1d5db;
+      background: white;
+      width: 200px;
+      transition: width 0.3s ease;
+    }
+
+    .search-input:focus {
+      width: 260px;
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    .abstract {
+      display: none;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 bg-[url('https://www.transparenttextures.com/patterns/concrete-wall.png')] bg-repeat text-gray-800">
+<!-- Google Font: Bodoni Moda Italic -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,600&display=swap" rel="stylesheet">
+
+<!-- Enhanced Glass Header -->
+<header class="w-full flex items-center justify-between px-6 py-4 relative backdrop-blur-md bg-gray-100 shadow-lg border-b border-white/40 z-10 rounded-b-xl" style="font-family: 'Bodoni Moda', serif; font-style: italic;">
+
+
+  <!-- Title -->
+  <h1 class="text-2xl font-bold mx-auto text-gray-800 drop-shadow">
+    ReachUp Dashboard
+  </h1>
+
+  <!-- Search + Toggle Button -->
+  <div class="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center space-x-3 z-50">
+    <input 
+      type="text" 
+      placeholder="Search..." 
+      class="text-sm px-3 py-1.5 rounded-md border border-white/50 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white/60 text-gray-700 shadow-md placeholder-gray-500 backdrop-blur-md"
+    />
+    <button id="menu-toggle" class="bg-black text-white p-2 rounded-full hover:bg-gray-800 active:bg-gray-900 transition duration-200 shadow-md">
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+  </svg>
+</button>
+
+</header>
+
+
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full transform -translate-x-full transition-transform duration-300 z-40 shadow-xl">
+  <div class="px-6 py-6 border-b border-gray-200">
+    <a href="#" class="flex items-center space-x-3">
+      <img src="./assets/img/logo-ct-dark.png" alt="ReachUp logo" class="h-8 w-auto">
+      <span class="text-xl font-bold text-gray-800">ReachUp</span>
+    </a>
+  </div>
+  <nav class="mt-6 px-6 space-y-2">
+    <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-blue-600 font-medium bg-blue-50 hover:bg-blue-100 transition">
+      <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+    </a>
+    <a href="./products.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-box"></i><span>Manage products</span>
+    </a>
+    <a href="./creative tools.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-tools"></i><span>Creative Tools</span>
+    </a>
+    <hr class="my-4 border-gray-300">
+    <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-user"></i><span>Settings</span>
+    </a>
+    <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-info-circle"></i><span>Help</span>
+    </a>
+    <a href="#" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-info-circle"></i><span>Logout</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="min-h-screen p-8 pt-2 ml-0 transition-all duration-300 ease-in-out">
+  <div class="max-w-7xl mx-auto space-y-12">
+
+    <!-- Slideshow + Goal Tracker Centered -->
+    <div class="flex flex-col md:flex-row justify-center items-center gap-8 mt-4">
+      <!-- Slideshow -->
+      <div class="slideshow-wrapper relative h-72 w-full max-w-3xl">
+        <img src="assets/img/carousel-1.jpg" class="carousel-item active w-full h-full object-cover rounded-xl" />
+        <img src="assets/img/carousel-2.jpg" class="carousel-item w-full h-full object-cover rounded-xl" />
+        <img src="assets/img/carousel-3.jpg" class="carousel-item w-full h-full object-cover rounded-xl" />
+        <img src="assets/img/carousel-2.jpg" class="carousel-item w-full h-full object-cover rounded-xl" />
+      </div>
+
+      <!-- Goal Tracker -->
+      <div class="card p-12 flex flex-col justify-between w-100 h-300">
+        <div>
+          <h4 class="text-sm font-semibold mb-2">Reward Progress</h4>
+          <p class="text-xs text-gray-500 mb-2">Minimum Payout RM 15</p>
+          <div class="w-full bg-gray-300 rounded-full h-2">
+            <div class="bg-black h-2 rounded-full" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="text-right text-xs mt-4 font-bold text-gray-800">RM 15</div>
+      </div>
+    </div>
+
+  <!-- Container to hold all 3 cards side by side -->
+<div class="flex flex-col lg:flex-row gap-4">
+
+  <!-- 🥇 Widget 1 -->
+  <div class="card p-6 flex-1">
+    <h3 class="text-lg font-semibold mb-4">Top Performing Product #1</h3>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 2a1 1 0 01.894.553l1.382 2.764 3.05.444a1 1 0 01.554 1.707l-2.207 2.15.521 3.03a1 1 0 01-1.451 1.054L10 12.347l-2.743 1.445a1 1 0 01-1.451-1.054l.521-3.03-2.207-2.15a1 1 0 01.554-1.707l3.05-.444L9.106 2.553A1 1 0 0110 2z"/>
+        </svg>
+      </div>
+      <img src="./assets/img/snacks.jpg" alt="Snacks on Snacks" class="w-16 h-16 object-contain rounded-md bg-gray-100 p-1" />
+      <div>
+        <h4 class="font-bold">Snacks on snacks</h4>
+        <p class="text-sm text-gray-500">#1 Most Clicked</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🥈 Widget 2 -->
+  <div class="card p-6 flex-1">
+    <h3 class="text-lg font-semibold mb-4">Top Performing Product #2</h3>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 2a1 1 0 01.894.553l1.382 2.764 3.05.444a1 1 0 01.554 1.707l-2.207 2.15.521 3.03a1 1 0 01-1.451 1.054L10 12.347l-2.743 1.445a1 1 0 01-1.451-1.054l.521-3.03-2.207-2.15a1 1 0 01.554-1.707l3.05-.444L9.106 2.553A1 1 0 0110 2z"/>
+        </svg>
+      </div>
+      <img src="./assets/img/Kintry.png" alt="Sugarbelle" class="w-16 h-16 object-contain rounded-md bg-gray-100 p-1" />
+      <div>
+        <h4 class="font-bold">Kintry</h4>
+        <p class="text-sm text-gray-500">#2 Most Clicked</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🥉 Widget 3 -->
+  <div class="card p-6 flex-1">
+    <h3 class="text-lg font-semibold mb-4">Top Performing Product #3</h3>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-yellow-900 flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 2a1 1 0 01.894.553l1.382 2.764 3.05.444a1 1 0 01.554 1.707l-2.207 2.15.521 3.03a1 1 0 01-1.451 1.054L10 12.347l-2.743 1.445a1 1 0 01-1.451-1.054l.521-3.03-2.207-2.15a1 1 0 01.554-1.707l3.05-.444L9.106 2.553A1 1 0 0110 2z"/>
+        </svg>
+      </div>
+      <img src="./assets/img/thavia.png" alt="Thavia" class="w-16 h-16 object-contain rounded-md bg-gray-100 p-1" />
+      <div>
+        <h4 class="font-bold">Thavia</h4>
+        <p class="text-sm text-gray-500">#3 Most Clicked</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- Container for side-by-side widgets -->
+<div class="flex flex-col lg:flex-row gap-4">
+
+  <!-- 📣 Featured Campaigns (moved left) -->
+  <div class="card p-6 w-full lg:w-1/2">
+    <h3 class="text-lg font-semibold mb-4">Featured Products</h3>
+    <div class="space-y-4">
+      <div class="flex items-center gap-3">
+        <img src="./assets/img/lilin and co.png" alt="Lilin+co" class="w-12 h-12 object-contain rounded-md bg-gray-100 p-1" />
+        <div>
+          <h4 class="font-bold">Lilin+co</h4>
+          <p class="text-sm text-gray-500">Handmade candles</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <img src="./assets/img/serasi.jpg" alt="Serasi" class="w-12 h-12 object-contain rounded-md bg-gray-100 p-1" />
+        <div>
+          <h4 class="font-bold">Serasi</h4>
+          <p class="text-sm text-gray-500">Handcrafted, all‑natural body lotions, face masks, essential oils.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 👥 Live Affiliate Registrations -->
+  <div class="card p-6 w-full lg:w-1/2">
+    <h3 class="text-lg font-semibold mb-4">Live Affiliate Registrations</h3>
+    <div class="space-y-4 text-sm text-gray-700">
+      <div class="flex justify-between border-b pb-2">
+        <span><strong>Today:</strong></span>
+        <span id="aff-today">Loading...</span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span><strong>This Week:</strong></span>
+        <span id="aff-week">Loading...</span>
+      </div>
+      <div class="flex justify-between border-b pb-2">
+        <span><strong>This Month:</strong></span>
+        <span id="aff-month">Loading...</span>
+      </div>
+      <div class="flex justify-between">
+        <span><strong>Total Affiliates:</strong></span>
+        <span id="aff-total">Loading...</span>
+      </div>
+    </div>
+    <div class="mt-4 text-xs text-gray-500 text-right" id="aff-updated">Loading...</div>
+  </div>
+
+</div>
+
+
+
+
+<script>
+  // 🔁 Slideshow setup
+  const slides = document.querySelectorAll('.carousel-item');
+  let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => slide.classList.remove('active'));
+    slides[index].classList.add('active');
+  }
+
+  function startSlideShow() {
+    slideInterval = setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 4000);
+  }
+
+  function stopSlideShow() {
+    clearInterval(slideInterval);
+  }
+
+  const carousel = document.querySelector('.slideshow-wrapper');
+  carousel.addEventListener('mouseenter', stopSlideShow);
+  carousel.addEventListener('mouseleave', startSlideShow);
+
+  showSlide(currentSlide);
+  startSlideShow();
+
+  // 📦 Sidebar toggle
+  const toggleButton = document.getElementById('menu-toggle');
+  const sidebar = document.getElementById('sidebar');
+  toggleButton.addEventListener('click', () => {
+    sidebar.classList.toggle('-translate-x-full');
+  });
+
+  // 🔥 Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCReViE1ZJf5aVh1JTIT4ybE3ae9555-pU",
+    authDomain: "capstoneproject-25b37.firebaseapp.com",
+    projectId: "capstoneproject-25b37",
+    storageBucket: "capstoneproject-25b37.firebasestorage.app",
+    messagingSenderId: "291876854043",
+    appId: "1:291876854043:web:45b516b9bdb7624b4e5bbe",
+    measurementId: "G-VB5ZLD9VBN"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // 📊 Real-time Affiliate Stats
+  function updateAffiliateStats() {
+    db.collection('users').onSnapshot(snapshot => {
+      const affiliates = [];
+      snapshot.forEach(doc => affiliates.push(doc.data()));
+
+      const now = new Date();
+      const today = affiliates.filter(a => {
+        const d = a.createdAt?.toDate?.() || new Date(a.createdAt);
+        return d.toDateString() === now.toDateString();
+      }).length;
+
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - now.getDay());
+      const thisWeek = affiliates.filter(a => {
+        const d = a.createdAt?.toDate?.() || new Date(a.createdAt);
+        return d >= weekStart;
+      }).length;
+
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const thisMonth = affiliates.filter(a => {
+        const d = a.createdAt?.toDate?.() || new Date(a.createdAt);
+        return d >= monthStart;
+      }).length;
+
+      const total = affiliates.length;
+
+      document.getElementById('aff-today').textContent = today + " new affiliates";
+      document.getElementById('aff-week').textContent = thisWeek + " signups";
+      document.getElementById('aff-month').textContent = thisMonth + " signups";
+      document.getElementById('aff-total').textContent = total;
+      document.getElementById('aff-updated').textContent = "Updated just now";
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', updateAffiliateStats);
+
+  // 🥇 Live Top Campaign Updates
+  const topCampaignSelectors = [
+    ".flex.flex-col.lg\\:flex-row > div:nth-child(1)",
+    ".flex.flex-col.lg\\:flex-row > div:nth-child(2)",
+    ".flex.flex-col.lg\\:flex-row > div:nth-child(3)"
+  ];
+
+  function updateTopCampaignWidgets() {
+    const now = Date.now();
+    db.collection("products")
+      .orderBy("createdAt", "desc")
+      .limit(3)
+      .onSnapshot(snapshot => {
+        snapshot.docs.forEach((doc, i) => {
+          const data = doc.data();
+          const widget = document.querySelector(topCampaignSelectors[i]);
+          if (!widget) return;
+
+          const img = widget.querySelector("img");
+          const nameEl = widget.querySelector("h4");
+          const descEl = widget.querySelector("p");
+
+          img.src = data.imgURL || "./assets/img/default.jpg";
+          img.alt = data.name || "Product Image";
+          nameEl.textContent = data.name || "Unnamed Product";
+
+          const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt);
+          const hoursOld = (now - createdAt.getTime()) / (1000 * 60 * 60);
+          descEl.textContent = hoursOld < 48 ? `#${i + 1} New Arrival` : `#${i + 1} Most Clicked`;
+          descEl.className = `text-sm ${hoursOld < 48 ? "text-red-500" : "text-gray-500"}`;
+        });
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', updateTopCampaignWidgets);
+</script>

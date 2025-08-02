@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" class="text-[15px]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReachUp</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRvEieI2Jf5aVhJ1TT4ybE3ae9555-pU",
+      authDomain: "capstoneproject-25b37.firebaseapp.com",
+      projectId: "capstoneproject-25b37",
+      storageBucket: "capstoneproject-25b37.appspot.com",
+      messagingSenderId: "291876854043",
+      appId: "1:291876854043:web:4b516b9bdb7624b4e5bbe"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+  </script>
+
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1D1D1F;
+    }
+
+    #sidebar {
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.5);
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #1D1D1F;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+      color: #2563eb;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+<!-- Google Font: Bodoni Moda Italic -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,600&display=swap" rel="stylesheet">
+
+<!-- Enhanced Glass Header -->
+<header class="w-full flex items-center justify-between px-6 py-4 relative backdrop-blur-md bg-gray-100 shadow-lg border-b border-white/40 z-10 rounded-b-xl" style="font-family: 'Bodoni Moda', serif; font-style: italic;">
+  <h1 class="text-2xl font-bold mx-auto text-gray-800 drop-shadow">ReachUp Dashboard</h1>
+  <div class="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center space-x-3 z-50">
+    <input type="text" placeholder="Search..." class="text-sm px-3 py-1.5 rounded-md border border-white/50 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white/60 text-gray-700 shadow-md placeholder-gray-500 backdrop-blur-md"/>
+    <button id="menu-toggle" class="bg-black text-white p-2 rounded-full hover:bg-gray-800 active:bg-gray-900 transition duration-200 shadow-md">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full transform -translate-x-full transition-transform duration-300 z-40 shadow-xl">
+  <div class="px-6 py-6 border-b border-gray-200">
+    <a href="#" class="flex items-center space-x-3">
+      <img src="./assets/img/logo-ct-dark.png" alt="ReachUp logo" class="h-8 w-auto">
+      <span class="text-xl font-bold text-gray-800">ReachUp</span>
+    </a>
+  </div>
+  <nav class="mt-6 px-6 space-y-2">
+    <a href="./index.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-blue-600 font-medium bg-blue-50 hover:bg-blue-100 transition">
+      <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+    </a>
+    <a href="./products.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-box"></i><span>Manage products</span>
+    </a>
+    <a href="./creative tools.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-tools"></i><span>Creative Tools</span>
+    </a>
+    <hr class="my-4 border-gray-300">
+    <a href="./profile.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-user"></i><span>Settings</span>
+    </a>
+    <a href="./logout.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-info-circle"></i><span>Logout</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- Product Upload Section -->
+<section class="w-full max-w-3xl mx-auto my-8 p-6 bg-white/50 backdrop-blur-lg rounded-xl shadow-md border border-white/30">
+  <h2 class="text-xl font-bold mb-4 text-gray-800">Add Product Details</h2>
+  <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Product Name</label>
+      <input type="text" name="productName" class="mt-1 p-2 w-full border rounded-md" required>
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-gray-700">Product Description</label>
+      <textarea name="productDesc" rows="3" class="mt-1 p-2 w-full border rounded-md resize-none" required></textarea>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Commission (%)</label>
+      <input type="number" name="commission" class="mt-1 p-2 w-full border rounded-md" required>
+    </div>
+    <div class="md:col-span-2">
+      <label class="block text-sm font-medium text-gray-700">Product Image URL</label>
+      <input type="text" name="productImageUrl" placeholder="https://example.com/image.jpg" class="mt-1 p-2 w-full border rounded-md" required>
+    </div>
+    <div class="md:col-span-2 text-right">
+      <button type="submit" class="glass-btn px-4 py-2 rounded-md text-sm">Upload Product</button>
+    </div>
+  </form>
+</section>
+
+<!-- Product Table Display -->
+<section class="w-full max-w-7xl mx-auto px-6 mb-8">
+  <h2 class="text-lg font-bold mb-4 text-gray-800">Uploaded Products</h2>
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white/50 backdrop-blur-lg rounded-xl shadow-md border border-white/30">
+      <thead class="bg-gray-200 text-gray-700 text-sm">
+        <tr>
+          <th class="py-3 px-4 text-left">Image</th>
+          <th class="py-3 px-4 text-left">Name</th>
+          <th class="py-3 px-4 text-left">Description</th>
+          <th class="py-3 px-4 text-left">Commission</th>
+          <th class="py-3 px-4 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody" class="text-sm text-gray-700">
+        <!-- Rows added dynamically from Firestore -->
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 📦 Edit Widget Popup -->
+<div id="editWidget" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-lg border w-full max-w-md hidden">
+  <h3 class="text-lg font-bold mb-4 text-gray-800">Edit Product</h3>
+  <form id="editProductForm" class="space-y-4">
+    <input type="text" name="editName" class="w-full p-2 border rounded" placeholder="Product Name" required />
+    <input type="text" name="editDescription" class="w-full p-2 border rounded" placeholder="Description" required />
+    <input type="number" name="editCommission" class="w-full p-2 border rounded" placeholder="Commission (%)" required />
+    <input type="url" name="editImgURL" class="w-full p-2 border rounded" placeholder="Image URL" required />
+    <div class="flex justify-between pt-2">
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save</button>
+      <button type="button" onclick="closeEditWidget()" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Sidebar toggle
+  document.getElementById('menu-toggle').addEventListener('click', function () {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+  });
+
+  let editProductId = null;
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("productForm");
+    const tableBody = document.getElementById("productTableBody");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const name = formData.get("productName");
+      const description = formData.get("productDesc");
+      const commission = formData.get("commission");
+      const imageURL = formData.get("productImageUrl");
+
+      try {
+        const submitBtn = form.querySelector("button[type='submit']");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Uploading...";
+
+        await db.collection("products").add({
+          name,
+          description,
+          commission,
+          imgURL: imageURL,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Upload Product";
+        renderProducts();
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Failed to upload product: " + err.message);
+      }
+    });
+
+    async function renderProducts() {
+      tableBody.innerHTML = "";
+      const snapshot = await db.collection("products").orderBy("createdAt", "desc").get();
+      snapshot.forEach(doc => {
+        const product = doc.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="py-3 px-4"><img src="${product.imgURL}" class="w-16 h-16 object-cover rounded"/></td>
+          <td class="py-3 px-4 font-semibold">${product.name}</td>
+          <td class="py-3 px-4 text-gray-600">${product.description}</td>
+          <td class="py-3 px-4 text-green-600 font-bold">${product.commission}%</td>
+          <td class="py-3 px-4 flex gap-2">
+            <button onclick="editProduct('${doc.id}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit</button>
+            <button onclick="deleteProduct('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    renderProducts();
+  });
+
+  async function deleteProduct(productId) {
+    if (confirm("Are you sure you want to delete this product?")) {
+      try {
+        await db.collection("products").doc(productId).delete();
+        alert("Product deleted.");
+        location.reload();
+      } catch (err) {
+        console.error("Error deleting product:", err);
+        alert("Delete failed: " + err.message);
+      }
+    }
+  }
+
+  async function editProduct(productId) {
+    const docRef = db.collection("products").doc(productId);
+    try {
+      const doc = await docRef.get();
+      if (doc.exists) {
+        const data = doc.data();
+        editProductId = productId;
+        const form = document.getElementById("editProductForm");
+        form.editName.value = data.name;
+        form.editDescription.value = data.description;
+        form.editCommission.value = data.commission;
+        form.editImgURL.value = data.imgURL;
+        document.getElementById("editWidget").classList.remove("hidden");
+      }
+    } catch (err) {
+      console.error("Error fetching product:", err);
+      alert("Unable to load product for editing");
+    }
+  }
+
+  document.getElementById("editProductForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const updatedData = {
+      name: form.editName.value,
+      description: form.editDescription.value,
+      commission: form.editCommission.value,
+      imgURL: form.editImgURL.value
+    };
+
+    try {
+      await db.collection("products").doc(editProductId).update(updatedData);
+      alert("Product updated!");
+      closeEditWidget();
+      location.reload();
+    } catch (err) {
+      console.error("Error updating product:", err);
+      alert("Failed to update: " + err.message);
+    }
+  });
+
+  function closeEditWidget() {
+    document.getElementById("editWidget").classList.add("hidden");
+    editProductId = null;
+  }
+</script>

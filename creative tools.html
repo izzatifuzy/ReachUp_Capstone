@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" class="text-[15px]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReachUp</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1D1D1F;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .glass-card {
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .mobile-frame {
+      width: 300px;
+      height: 550px;
+      border-radius: 2rem;
+      border: 8px solid #333;
+      background: #fff;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .mobile-frame::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .mobile-frame::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    .slideshow-wrapper {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .card {
+      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+   #sidebar {
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.5);
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body>
+<!-- Google Font: Bodoni Moda Italic -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,600&display=swap" rel="stylesheet">
+
+<!-- Enhanced Glass Header -->
+<header class="w-full flex items-center justify-between px-6 py-4 relative backdrop-blur-md bg-gray-100 shadow-lg border-b border-white/40 z-10 rounded-b-xl" style="font-family: 'Bodoni Moda', serif; font-style: italic;">
+  <h1 class="text-2xl font-bold mx-auto text-gray-800 drop-shadow">ReachUp Dashboard</h1>
+  <div class="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center space-x-3 z-50">
+    <input type="text" placeholder="Search..." class="text-sm px-3 py-1.5 rounded-md border border-white/50 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white/60 text-gray-700 shadow-md placeholder-gray-500 backdrop-blur-md"/>
+    <button id="menu-toggle" class="bg-black text-white p-2 rounded-full hover:bg-gray-800 active:bg-gray-900 transition duration-200 shadow-md">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full transform -translate-x-full transition-transform duration-300 z-40 shadow-xl">
+  <div class="px-6 py-6 border-b border-gray-200">
+    <a href="#" class="flex items-center space-x-3">
+      <img src="./assets/img/logo-ct-dark.png" alt="ReachUp logo" class="h-8 w-auto">
+      <span class="text-xl font-bold text-gray-800">ReachUp</span>
+    </a>
+  </div>
+  <nav class="mt-6 px-6 space-y-2">
+    <a href="./index.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-blue-600 font-medium bg-blue-50 hover:bg-blue-100 transition">
+      <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+    </a>
+    <a href="./products.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-box"></i><span>Manage products</span>
+    </a>
+    <a href="./creative tools.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-tools"></i><span>Creative Tools</span>
+    </a>
+    <hr class="my-4 border-gray-300">
+    <a href="./profile.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-user"></i><span>Settings</span>
+    </a>
+    <a href="./logout.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-info-circle"></i><span>Logout</span>
+    </a>
+  </nav>
+</aside>
+
+<main class="p-6 space-y-8">
+  <!-- DASHBOARD WIDGETS -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="glass-card">
+    <h3 class="text-lg font-bold mb-1">Total Affiliates</h3>
+    <p id="total-affiliates" class="text-3xl font-extrabold">...</p>
+    <p class="text-sm text-gray-500 mt-2">Live count</p>
+  </div>
+  <div class="glass-card">
+    <h3 class="text-lg font-bold mb-1">Total Earnings</h3>
+    <p id="total-earnings" class="text-3xl font-extrabold">...</p>
+    <p class="text-sm text-gray-500 mt-2">Estimated payout</p>
+  </div>
+  <div class="glass-card">
+    <h3 class="text-lg font-bold mb-1">New Signups</h3>
+    <p id="new-signups" class="text-3xl font-extrabold">...</p>
+    <p class="text-sm text-gray-500 mt-2">Just today</p>
+  </div>
+</section>
+
+  <!-- STACKED LINK + DESIGN PREVIEW SECTION -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Left: Link Manager -->
+    <div class="glass-card">
+      <h2 class="text-xl font-bold mb-4">Stack Your Product Links</h2>
+      <div class="flex space-x-2 mb-3">
+        <input id="product-name" type="text" placeholder="Product Name" class="px-3 py-2 w-1/2 rounded bg-white text-gray-700 border">
+        <input id="product-url" type="text" placeholder="Product URL" class="px-3 py-2 w-1/2 rounded bg-white text-gray-700 border">
+      </div>
+      <button onclick="addLink()" class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 mb-4">Add Product</button>
+      <ul id="link-list" class="space-y-2"></ul>
+      <div class="mt-6">
+        <label class="block mb-2 font-semibold">Design Template:</label>
+        <select id="design-template" class="px-2 py-1 rounded border bg-white">
+          <option value="minimal">Minimal</option>
+          <option value="gradient">Gradient</option>
+          <option value="neon">Neon</option>
+          <option value="shadow">Soft Shadow</option>
+        </select>
+      </div>
+    </div>
+    <!-- Right: Preview -->
+    <div class="glass-card flex justify-center items-center">
+      <div class="mobile-frame" id="preview-links">
+        <h3 class="text-center text-lg font-bold text-gray-700 mb-4">Mobile Bio Preview</h3>
+        <!-- dynamic links will render here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Copy Your Link Widget -->
+  <section class="glass-card mt-6 max-w-2xl mx-auto text-center">
+    <h2 class="text-xl font-bold mb-3">Copy your link here!</h2>
+    <p class="text-sm text-gray-600 mb-3">
+      This link shows all your stacked products. Share it on socials—just like Linktree!
+    </p>
+    <div class="flex items-center space-x-2 justify-center mb-3">
+      <input id="bio-link" type="text" readonly class="w-full max-w-md px-3 py-2 border rounded bg-white text-gray-700">
+      <button onclick="copyBioLink()" class="px-4 py-2 bg-purple-600 text-white rounded shadow hover:bg-purple-700">Copy</button>
+    </div>
+    <button onclick="updateBioLinkDisplay()" class="px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700">Generate Bio Link</button>
+    <p id="copy-msg" class="text-green-600 text-sm hidden mt-2">Link copied to clipboard!</p>
+  </section>
+</main>
+
+<script>
+  // 🔥 Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCReViE1ZJf5aVh1JTIT4ybE3ae9555-pU",
+    authDomain: "capstoneproject-25b37.firebaseapp.com",
+    projectId: "capstoneproject-25b37",
+    storageBucket: "capstoneproject-25b37.appspot.com",
+    messagingSenderId: "291876854043",
+    appId: "1:291876854043:web:45b516b9bdb7624b4e5bbe",
+    measurementId: "G-VB5ZLD9VBN"
+  };
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  const db = firebase.firestore();
+
+  // 🧩 Bio link data
+  let links = [];
+
+  async function loadLinks() {
+    const snapshot = await db.collection('links').get();
+    links = [];
+    snapshot.forEach(doc => links.push(doc.data()));
+    renderLinks();
+    renderPreview();
+  }
+
+  window.onload = () => {
+    loadLinks();
+    syncDashboardStats(); // ← Added this to kick off widget data sync
+  };
+
+  async function addLink() {
+    const name = document.getElementById('product-name').value.trim();
+    const url = document.getElementById('product-url').value.trim();
+    if (!name || !url) {
+      alert("Please fill in both the product name and link.");
+      return;
+    }
+    const linkData = { name, url };
+    try {
+      await db.collection('links').add(linkData);
+      links.push(linkData);
+      document.getElementById('product-name').value = '';
+      document.getElementById('product-url').value = '';
+      renderLinks();
+      renderPreview();
+    } catch (err) {
+      alert("Failed to add link: " + err.message);
+    }
+  }
+
+  function updateBioLinkDisplay() {
+    const bioInput = document.getElementById('bio-link');
+    if (!bioInput) return;
+    if (links.length === 0) {
+      bioInput.value = '';
+      alert("Please stack some product links before generating.");
+      return;
+    }
+    const encodedLinks = encodeURIComponent(JSON.stringify(links));
+    const customLink = `bio.html?data=${encodedLinks}`;
+    bioInput.value = customLink;
+  }
+
+  function copyBioLink() {
+    const input = document.getElementById('bio-link');
+    navigator.clipboard.writeText(input.value).then(() => {
+      const msg = document.getElementById('copy-msg');
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 2000);
+    });
+  }
+
+  document.getElementById('menu-toggle')?.addEventListener('click', function () {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+    sidebar.classList.toggle('translate-x-0');
+  });
+
+  function renderLinks() {
+    const list = document.getElementById('link-list');
+    list.innerHTML = '';
+    links.forEach((link, idx) => {
+      const item = document.createElement('li');
+      item.className = 'bg-white/70 p-2 rounded flex justify-between items-center space-x-2 cursor-move';
+      item.setAttribute('data-id', idx);
+      item.innerHTML = `
+        <input value="${link.name}" class="w-full px-2 py-1 border rounded bg-white text-gray-700" 
+               onchange="editName(${idx}, this.value)">
+        <button onclick="removeLink(${idx})" class="text-red-600 font-bold">✕</button>
+      `;
+      list.appendChild(item);
+    });
+    Sortable.create(list, {
+      animation: 150,
+      onEnd: function (evt) {
+        const [movedItem] = links.splice(evt.oldIndex, 1);
+        links.splice(evt.newIndex, 0, movedItem);
+        renderPreview();
+      }
+    });
+  }
+
+  async function editName(index, newName) {
+    links[index].name = newName;
+    const snapshot = await db.collection('links').get();
+    const docId = snapshot.docs[index].id;
+    await db.collection('links').doc(docId).update({ name: newName });
+    renderPreview();
+  }
+
+  async function removeLink(index) {
+    const snapshot = await db.collection('links').get();
+    const docId = snapshot.docs[index].id;
+    await db.collection('links').doc(docId).delete();
+    links.splice(index, 1);
+    renderLinks();
+    renderPreview();
+  }
+
+  function renderPreview() {
+    const container = document.getElementById('preview-links');
+    container.innerHTML = '<h3 class="text-center text-lg font-bold text-gray-700 mb-4">Mobile Bio Preview</h3>';
+    const design = document.getElementById('design-template').value;
+    links.forEach(link => {
+      const button = document.createElement('a');
+      button.href = link.url;
+      button.textContent = link.name;
+      button.className = `block text-center w-full px-4 py-2 rounded mb-2 text-white font-semibold ${
+        design === 'gradient' ? 'bg-gradient-to-r from-green-400 to-blue-500' :
+        design === 'neon' ? 'bg-pink-500 shadow-lg shadow-pink-500/50' :
+        design === 'shadow' ? 'bg-gray-700 shadow-md' :
+        'bg-blue-600'
+      }`;
+      container.appendChild(button);
+    });
+  }
+
+  document.getElementById('design-template').addEventListener('change', renderPreview);
+
+  // 📊 Widget updater for Total Affiliates, Earnings, and New Signups
+  function syncDashboardStats() {
+    db.collection("users").onSnapshot(snapshot => {
+      const users = [];
+      snapshot.forEach(doc => users.push(doc.data()));
+
+      const now = new Date();
+      const todayCount = users.filter(u => {
+        const d = u.createdAt?.toDate?.() || new Date(u.createdAt);
+        return d.toDateString() === now.toDateString();
+      }).length;
+
+      const totalCount = users.length;
+      const estimatedCommission = totalCount * 10 + 30;
+
+      const affEl = document.getElementById("total-affiliates");
+      const signupsEl = document.getElementById("new-signups");
+      const earningsEl = document.getElementById("total-earnings");
+
+      if (affEl) affEl.textContent = totalCount.toLocaleString();
+      if (signupsEl) signupsEl.textContent = todayCount.toLocaleString();
+      if (earningsEl) earningsEl.textContent = "RM" + estimatedCommission.toLocaleString();
+    });
+  }
+</script>

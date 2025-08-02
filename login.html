@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,600&family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: url('https://www.transparenttextures.com/patterns/white-carbon.png'), #f0f0f0;
+      color: #000;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .widget-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .logo-header {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-header img { height: 40px; width: auto; }
+    .logo-name {
+      font-family: 'Bodoni Moda', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #222;
+    }
+    .logo-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      text-align: center;
+      color: #555;
+      margin-top: 0.6rem;
+    }
+    .highlight {
+      background: rgba(255, 255, 0, 0.3);
+      border-radius: 4px;
+      padding: 0 4px;
+    }
+    .form-section {
+      width: 60%;
+      display: flex;
+      flex-direction: column;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    input {
+      padding: 0.6rem 1rem;
+      border-radius: 50px;
+      border: 1px solid #ccc;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    button {
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    button:hover { opacity: 0.9; }
+    .footer-text {
+      margin-top: 0.75rem;
+      text-align: center;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .message {
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: red;
+    }
+    .message.success { color: green; }
+    @media (max-width: 640px) {
+      .widget-container { flex-direction: column; }
+      .logo-header, .form-section { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget-container">
+    <div class="logo-header">
+      <img src="./assets/img/logo-ct-dark.png" alt="ReachUp logo" style="height: 40px;">
+      <div class="logo-name">ReachUp</div>
+      <div class="logo-title"><span class="highlight">Login</span> to Your Account</div>
+    </div>
+
+    <div class="form-section">
+      <div id="error-message" class="message" style="display:none;"></div>
+      <div id="success-message" class="message success" style="display:none;"></div>
+      <form id="loginForm" autocomplete="off">
+        <input type="text" name="fakeusernameremembered" style="display:none;">
+        <input type="text" id="user_identifier" placeholder="Username / Email" autocomplete="off" required>
+        <input type="password" id="user_secret" placeholder="Password" autocomplete="new-password" required>
+        <button class="action-btn" type="submit">Login →</button>
+      </form>
+      <div class="footer-text">
+        <a href="register.html" style="text-decoration: none; color: #000; font-weight: 600;">
+          New here? <span style="color:#007bff;">Sign up now.</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCReViE1ZJf5aVh1JTIT4ybE3ae9555-pU",
+      authDomain: "capstoneproject-25b37.firebaseapp.com",
+      projectId: "capstoneproject-25b37",
+      storageBucket: "capstoneproject-25b37.firebasestorage.app",
+      messagingSenderId: "291876854043",
+      appId: "1:291876854043:web:45b516b9bdb7624b4e5bbe",
+      measurementId: "G-VB5ZLD9VBN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    const db = firebase.firestore();
+
+    // Login logic
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const usernameOrEmail = document.getElementById('user_identifier').value.trim();
+      const password = document.getElementById('user_secret').value;
+
+      let userSnap = await db.collection('users')
+        .where('username', '==', usernameOrEmail)
+        .where('password', '==', password)
+        .get();
+
+      if (userSnap.empty) {
+        userSnap = await db.collection('users')
+          .where('email', '==', usernameOrEmail)
+          .where('password', '==', password)
+          .get();
+      }
+
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      if (!userSnap.empty) {
+        successDiv.textContent = "Login successful! Redirecting...";
+        successDiv.style.display = 'block';
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
+      } else {
+        errorDiv.textContent = "Invalid credentials!";
+        errorDiv.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

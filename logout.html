@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Logout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,600&family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background: url('https://www.transparenttextures.com/patterns/white-carbon.png'), #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .widget-container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(18px);
+    border-radius: 16px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 480px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .logo-header img { height: 40px; }
+  .logo-name {
+    font-family: 'Bodoni Moda', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #222;
+  }
+  .message {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    color: #333;
+  }
+  .action-btn {
+    margin-top: 1rem;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 0.7rem 1.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .action-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="widget-container">
+    <div class="logo-header">
+      <img src="./assets/img/logo-ct-dark.png" alt="ReachUp logo" />
+      <div class="logo-name">ReachUp</div>
+    </div>
+    <div class="message" id="logout-message">
+      Logging you out...
+    </div>
+  </div>
+  <script>
+    // Firebase config (same as other HTML files)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCReViE1ZJf5aVh1JTIT4ybE3ae9555-pU",
+      authDomain: "capstoneproject-25b37.firebaseapp.com",
+      projectId: "capstoneproject-25b37",
+      storageBucket: "capstoneproject-25b37.appspot.com",
+      messagingSenderId: "291876854043",
+      appId: "1:291876854043:web:45b516b9bdb7624b4e5bbe",
+      measurementId: "G-VB5ZLD9VBN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    const auth = firebase.auth();
+
+    // Sign out user and redirect to login page
+    auth.signOut().then(() => {
+      document.getElementById('logout-message').textContent = "You have been successfully logged out. Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1200);
+    }).catch(() => {
+      document.getElementById('logout-message').textContent = "You have been logged out. Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1200);
+    });
+  </script>
+</body>
+</html>

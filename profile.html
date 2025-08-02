@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" class="text-[16px]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile Settings</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <style>
+    /* ...existing styles... */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1D1D1F;
+      position: relative;
+      overflow-x: hidden;
+    }
+    #sidebar {
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.5);
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.05);
+    }
+    .glass-card {
+      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      transition: all 0.3s ease-in-out;
+    }
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+    .message { margin-bottom: 0.75rem; font-size: 0.95rem; text-align: center; color: red; }
+    .message.success { color: green; }
+  </style>
+</head>
+<body>
+<!-- Google Font: Bodoni Moda Italic -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,600&display=swap" rel="stylesheet">
+
+<!-- Enhanced Glass Header -->
+<header class="w-full flex items-center justify-between px-6 py-4 relative backdrop-blur-md bg-gray-100 shadow-lg border-b border-white/40 z-10 rounded-b-xl" style="font-family: 'Bodoni Moda', serif; font-style: italic;">
+  <h1 class="text-2xl font-bold mx-auto text-gray-800 drop-shadow">ReachUp Dashboard</h1>
+  <div class="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center space-x-3 z-50">
+    <input 
+      type="text" 
+      placeholder="Search..." 
+      class="text-sm px-3 py-1.5 rounded-md border border-white/50 focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white/60 text-gray-700 shadow-md placeholder-gray-500 backdrop-blur-md"
+    />
+    <button id="menu-toggle" class="bg-black text-white p-2 rounded-full hover:bg-gray-800 active:bg-gray-900 transition duration-200 shadow-md">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="fixed top-0 left-0 w-64 h-full transform -translate-x-full transition-transform duration-300 z-40 shadow-xl">
+  <div class="px-6 py-6 border-b border-gray-200">
+    <a href="#" class="flex items-center space-x-3">
+      <img src="./assets/img/logo-ct-dark.png" alt="ReachUp logo" class="h-8 w-auto">
+      <span class="text-xl font-bold text-gray-800">ReachUp</span>
+    </a>
+  </div>
+  <nav class="mt-6 px-6 space-y-2">
+    <a href="./index.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-blue-600 font-medium bg-blue-50 hover:bg-blue-100 transition">
+      <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+    </a>
+    <a href="./products.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-box"></i><span>Manage products</span>
+    </a>
+    <a href="./creative tools.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-tools"></i><span>Creative Tools</span>
+    </a>
+    <hr class="my-4 border-gray-300">
+    <a href="./profile.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-user"></i><span>Settings</span>
+    </a>
+    <a href="./logout.html" class="flex items-center space-x-3 py-2 px-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-black transition">
+      <i class="fas fa-info-circle"></i><span>Logout</span>
+    </a>
+  </nav>
+</aside>
+
+<main class="pt-12 px-6 flex flex-col items-center justify-center min-h-screen">
+  <div class="glass-card w-full max-w-4xl space-y-6">
+    <div class="text-center">
+      <h2 class="text-2xl font-bold">Profile Settings</h2>
+      <p class="text-gray-600">Update your information</p>
+    </div>
+    <div id="error-message" class="message" style="display:none;"></div>
+    <div id="success-message" class="message success" style="display:none;"></div>
+    <form id="profileForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base" autocomplete="off">
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 mb-1">Username</label>
+        <input type="text" name="full_name" id="full_name" required class="w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 mb-1">Email</label>
+        <input type="email" name="user_email" id="user_email" required class="w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" />
+      </div>
+      <div class="md:col-span-2">
+  <label for="new_password" class="block text-gray-700 mb-1">New Password</label>
+  <input 
+    type="password" 
+    name="new_password" 
+    id="new_password" 
+    class="w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200" 
+    placeholder="Enter new password" 
+  />
+</div>
+
+      <div class="md:col-span-2 text-right">
+        <button type="submit" class="bg-blue-600 text-white text-base px-6 py-2 rounded-md shadow hover:bg-blue-700 transition">Save Profile</button>
+      </div>
+    </form>
+    <div id="profile-preview" class="mt-6 text-center"></div>
+  </div>
+</main>
+
+<script>
+  // Sidebar toggle
+  document.getElementById('menu-toggle').addEventListener('click', function () {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+  });
+
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCReViE1ZJf5aVh1JTIT4ybE3ae9555-pU",
+    authDomain: "capstoneproject-25b37.firebaseapp.com",
+    projectId: "capstoneproject-25b37",
+    storageBucket: "capstoneproject-25b37.firebasestorage.app",
+    messagingSenderId: "291876854043",
+    appId: "1:291876854043:web:45b516b9bdb7624b4e5bbe",
+    measurementId: "G-VB5ZLD9VBN"
+  };
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  // Replace with actual user ID logic
+  const userId = "user_001";
+
+  // Load profile data
+  db.collection('profiles').doc(userId).get().then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      document.getElementById('full_name').value = data.full_name || "";
+      document.getElementById('user_email').value = data.user_email || "";
+      if (data.profile_img_url) {
+        document.getElementById('profile-preview').innerHTML = `<img src="${data.profile_img_url}" alt="Profile Image" class="mx-auto rounded-full shadow-md" style="width:100px;height:100px;">`;
+      }
+    }
+  });
+
+  // Save profile data
+  document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('full_name').value.trim();
+    const email = document.getElementById('user_email').value.trim();
+    const imgFile = document.getElementById('profile_img').files[0];
+
+    const errorDiv = document.getElementById('error-message');
+    const successDiv = document.getElementById('success-message');
+    errorDiv.style.display = 'none';
+    successDiv.style.display = 'none';
+
+    let profileImgUrl = "";
+    if (imgFile) {
+      const storageRef = storage.ref('profileImages/' + userId + '_' + imgFile.name);
+      await storageRef.put(imgFile);
+      profileImgUrl = await storageRef.getDownloadURL();
+    }
+
+    await db.collection('profiles').doc(userId).set({
+      full_name: fullName,
+      user_email: email,
+      profile_img_url: profileImgUrl
+    }, { merge: true });
+
+    successDiv.textContent = "Profile updated!";
+    successDiv.style.display = 'block';
+    if (profileImgUrl) {
+      document.getElementById('profile-preview').innerHTML = `<img src="${profileImgUrl}" alt="Profile Image" class="mx-auto rounded-full shadow-md" style="width:100px;height:100px;">`;
+    }
+  });
+</script>
+</body>
+</html>
